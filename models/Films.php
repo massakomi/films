@@ -122,4 +122,31 @@ class Films extends \yii\db\ActiveRecord
         $file->save();
         $this->link('poster', $file);
     }
+
+    /**
+     * @param array $selectedAuthors
+     * @return void
+     * @throws \yii\db\Exception
+     */
+    public function savePersons(array $selectedAuthors)
+    {
+        foreach ($selectedAuthors as $id) {
+            $filmPerson = new FilmPersons();
+            $filmPerson->film_id = $this->id;
+            $filmPerson->person_id = $id;
+            $filmPerson->save();
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function selectedPersons()
+    {
+        $selected = [];
+        foreach ($this->filmPersons as $item) {
+            $selected []= $item->person_id;
+        }
+        return $selected;
+    }
 }

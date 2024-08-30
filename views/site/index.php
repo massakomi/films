@@ -8,8 +8,6 @@
 /** @var app\models\FilmsSearch $searchModelPersons */
 /** @var yii\data\ActiveDataProvider $dataProviderPersons */
 
-$this->title = 'Films';
-
 ?>
 <div class="site-index">
 

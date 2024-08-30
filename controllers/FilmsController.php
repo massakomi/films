@@ -2,10 +2,12 @@
 
 namespace app\controllers;
 
+use app\models\FilmPersons;
 use app\models\Films;
 use app\models\FilmsSearch;
 use app\models\forms\UploadForm;
 use yii\filters\AccessControl;
+use yii\helpers\BaseHtml;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -86,6 +88,7 @@ class FilmsController extends Controller
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
                 $model->uploadPoster();
+                $model->savePersons(\Yii::$app->request->post('Films')['filmPersons']);
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -110,6 +113,7 @@ class FilmsController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             $model->uploadPoster();
+            $model->savePersons(\Yii::$app->request->post('Films')['filmPersons']);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

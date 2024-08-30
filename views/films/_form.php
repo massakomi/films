@@ -1,5 +1,7 @@
 <?php
 
+use app\widgets\select2\Select2Widget;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
 
@@ -19,6 +21,18 @@ use yii\bootstrap5\ActiveForm;
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'isbn')->textInput() ?>
+
+    <?php
+    echo $form->field($model, 'filmPersons')->widget(
+        Select2Widget::class,
+        [
+            'multiple' => true,
+            'value' => $model->selectedPersons(),
+            'items' => ArrayHelper::map(\app\models\Persons::find()->all(), 'id', 'fio')
+        ]
+    );
+    ?>
+
 
     <?= $form->field($model, 'poster_id')->fileInput(['hiddenOptions' => ['value' => $model->poster_id]]) ?>
     <?php

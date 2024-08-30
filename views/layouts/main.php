@@ -23,7 +23,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
-    <title><?= Html::encode($this->title) ?></title>
+    <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
     <?php $this->head() ?>
 </head>
 <body class="d-flex flex-column h-100">
@@ -74,7 +74,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; Films <?= date('Y') ?></div>
+            <div class="col-md-6 text-center text-md-start">&copy; <?=Yii::$app->name?> <?= date('Y') ?></div>
             <div class="col-md-6 text-center text-md-end"></div>
         </div>
     </div>
