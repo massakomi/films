@@ -1,11 +1,11 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use yii\bootstrap5\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\Films $model */
-/** @var yii\widgets\ActiveForm $form */
+/** @var yii\bootstrap5\ActiveForm $form */
 ?>
 
 <div class="films-form">
@@ -20,9 +20,14 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'isbn')->textInput() ?>
 
-    <?= $form->field($model, 'poster')->textInput() ?>
-
-    <?= $form->field($model, 'date_added')->textInput() ?>
+    <?= $form->field($model, 'poster_id')->fileInput(['hiddenOptions' => ['value' => $model->poster_id]]) ?>
+    <?php
+    if ($model->poster) {
+        ?>
+        <img src="/<?=$model->poster->path?>" class="mb-3 img-thumbnail w-25" alt="" />
+        <?php
+    }
+    ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

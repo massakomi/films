@@ -17,9 +17,9 @@ class m240830_104027_create_films_table extends Migration
             'name' => $this->string()->notNull(),
             'year' => $this->smallInteger()->notNull(),
             'description' => $this->text()->null(),
-            'isbn' => $this->integer()->null(),
-            'poster' => $this->integer(),
-            'date_added' => $this->datetime()->defaultExpression('CURRENT_TIMESTAMP')
+            'isbn' => $this->string(17)->null(),
+            'poster_id' => $this->integer(),
+            'date_added' => $this->datetime()
         ]);
 
         $this->createIndex('idx-films-poster', 'films', 'poster');

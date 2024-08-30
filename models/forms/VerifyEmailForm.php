@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models\auth;
+namespace app\models\forms;
 
 use app\models\User;
 use yii\base\InvalidArgumentException;

@@ -2,7 +2,10 @@
 
 namespace app\models;
 
+use app\models\forms\UploadForm;
 use Yii;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "films".
@@ -35,11 +38,14 @@ class Films extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'year'], 'required'],
-            [['year', 'isbn', 'poster'], 'integer'],
+            [['year'], 'integer'],
+            [['isbn'], 'string', 'max' => 17],
             [['description'], 'string'],
             [['date_added'], 'safe'],
             [['name'], 'string', 'max' => 255],
-            [['poster'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class, 'targetAttribute' => ['poster' => 'id']],
+            ['poster_id', 'file', 'extensions' => 'png, jpg, gif, webp', 'maxSize' => 1024 * 1024 * 10],
+            [['poster'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class, 'targetAttribute' => ['poster_id' => 'id']],
+
         ];
     }
 
@@ -70,12 +76,50 @@ class Films extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Poster0]].
+     * Gets query for [[Poster]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getPoster0()
+    public function getPoster()
     {
-        return $this->hasOne(Files::class, ['id' => 'poster']);
+        return $this->hasOne(Files::class, ['id' => 'poster_id']);
+    }
+
+    /**
+     * @param $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            $this->date_added = date('Y-m-d H:i:s');
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return void
+     * @throws \yii\base\Exception
+     */
+    public function uploadPoster()
+    {
+        $uploadForm = new UploadForm();
+        $uploadForm->image = UploadedFile::getInstance($this, 'poster_id');
+        if (!$uploadForm->image) {
+            return;
+        }
+        $path = $uploadForm->upload('posters', $id=1);
+        if (!$path) {
+            return;
+        }
+        $file = new Files();
+        if ($this->poster_id) {
+            $file = Files::findOne($this->poster_id);
+        }
+        $file->path = $path;
+        $file->save();
+        $this->link('poster', $file);
     }
 }

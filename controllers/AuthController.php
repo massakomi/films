@@ -1,18 +1,18 @@
 <?php
 namespace app\controllers;
 
-use app\models\auth\ResendVerificationEmailForm;
-use app\models\auth\VerifyEmailForm;
+use app\models\forms\ResendVerificationEmailForm;
+use app\models\forms\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use app\models\auth\LoginForm;
-use app\models\auth\PasswordResetRequestForm;
-use app\models\auth\ResetPasswordForm;
-use app\models\auth\SignupForm;
+use app\models\forms\LoginForm;
+use app\models\forms\PasswordResetRequestForm;
+use app\models\forms\ResetPasswordForm;
+use app\models\forms\SignupForm;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\helpers\Inflector;

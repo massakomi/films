@@ -1,12 +1,15 @@
 <?php
 
+use yii\data\ActiveDataProvider;
+use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var app\models\Persons $model */
+/** @var ActiveDataProvider $filmsProvider */
 
-$this->title = $model->id;
+$this->title = $model->fio;
 $this->params['breadcrumbs'][] = ['label' => 'Persons', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -15,6 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <?php if (!Yii::$app->user->isGuest) { ?>
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->id], [
@@ -25,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+    <?php } ?>
 
     <?= DetailView::widget([
         'model' => $model,
@@ -34,4 +39,16 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]) ?>
 
+    <div class="persons-films">
+        <h2>Фильмы</h2>
+        <?= GridView::widget([
+            'dataProvider' => $filmsProvider,
+            //'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'id',
+                'name',
+            ]
+        ]); ?>
+    </div>
 </div>

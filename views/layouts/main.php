@@ -37,15 +37,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
     $menuItems = [
-        ['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Contact', 'url' => ['/site/contact']],
-        /*['label' => 'Разное', 'items' => [
-            //['label' => 'Товары', 'url' => ['/site/products']],
-        ]],*/
+        ['label' => 'Films', 'url' => ['/films/']],
+        ['label' => 'Persons', 'url' => ['/persons/']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Регистрация', 'url' => ['/auth/signup']];
-        $menuItems[] = ['label' => 'Вход', 'url' => ['/auth/login']];
+        $menuItems[] = ['label' => 'Registration', 'url' => ['/auth/signup']];
+        $menuItems[] = ['label' => 'Login', 'url' => ['/auth/login']];
     } else {
         $menuItems[] = '<li>'
             . Html::beginForm(['/auth/logout'], 'post')
@@ -77,8 +74,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 <footer id="footer" class="mt-auto py-3 bg-light">
     <div class="container">
         <div class="row text-muted">
-            <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
-            <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
+            <div class="col-md-6 text-center text-md-start">&copy; Films <?= date('Y') ?></div>
+            <div class="col-md-6 text-center text-md-end"></div>
         </div>
     </div>
 </footer>

@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\FilmsSearch;
 use app\models\Persons;
 use app\models\PersonsSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -21,8 +23,19 @@ class PersonsController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'only' => ['create', 'update', 'delete'],
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'actions' => ['create', 'update','delete'],
+                            'roles' => ['@'],
+                        ],
+                    ],
+                ],
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -55,8 +68,12 @@ class PersonsController extends Controller
      */
     public function actionView($id)
     {
+        $model = new FilmsSearch();
+        $filmsProvider = $model->search(['person_id' => $id]);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'filmsProvider' => $filmsProvider,
         ]);
     }
 

@@ -42,7 +42,9 @@ class FilmsSearch extends Films
     {
         $query = Films::find();
 
-        // add conditions that should always apply here
+        if (array_key_exists('person_id', $params)) {
+            $query->joinWith('filmPersons')->where(['person_id' => $params['person_id']]);
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

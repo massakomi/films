@@ -2,14 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\User;
-use Yii;
-use yii\filters\AccessControl;
+use app\models\Files;
+use app\models\Films;
+use app\models\FilmsSearch;
+use app\models\PersonsSearch;
 use yii\web\Controller;
-use yii\web\Response;
-use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
 
 class SiteController extends Controller
 {
@@ -44,34 +41,18 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
-    }
+        $searchModel = new FilmsSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
 
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+        $searchModelPersons = new PersonsSearch();
+        $dataProviderPersons = $searchModelPersons->search($this->request->queryParams);
 
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'searchModelPersons' => $searchModelPersons,
+            'dataProviderPersons' => $dataProviderPersons,
         ]);
     }
 
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
 }

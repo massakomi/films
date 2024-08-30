@@ -1,10 +1,6 @@
 <?php
 
-use app\models\Films;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\grid\ActionColumn;
-use yii\grid\GridView;
 
 /** @var yii\web\View $this */
 /** @var app\models\FilmsSearch $searchModel */
@@ -23,27 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'name',
-            'year',
-            'description:ntext',
-            'isbn',
-            //'poster',
-            //'date_added',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Films $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
-
+    <?php echo $this->render('index_grid', compact('searchModel', 'dataProvider')); ?>
 
 </div>

@@ -1,5 +1,7 @@
 <?php
 
+use app\models\Files;
+use app\models\Films;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -15,6 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <?php if (!Yii::$app->user->isGuest) { ?>
     <p>
         <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Delete', ['delete', 'id' => $model->id], [
@@ -25,16 +28,27 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+    <?php } ?>
 
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'name',
             'year',
             'description:ntext',
             'isbn',
-            'poster',
+            [
+                'attribute' => 'poster_id',
+                'label' => 'Poster',
+                'format' => 'raw',
+                'value' => function(Films $model) {
+                    if ($model->poster) {
+                        return '<img src="/'.$model->poster->path.'" class="mb-3 img-thumbnail w-25" alt="" />';
+                    } else {
+                        return 'No image';
+                    }
+                }
+            ],
             'date_added',
         ],
     ]) ?>
