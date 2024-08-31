@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\FilmsSearch;
 use app\models\Persons;
 use app\models\PersonsSearch;
+use app\models\Subsribes;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -25,12 +26,17 @@ class PersonsController extends Controller
             [
                 'access' => [
                     'class' => AccessControl::class,
-                    'only' => ['create', 'update', 'delete'],
+                    'only' => ['create', 'update', 'delete', 'subscribe'],
                     'rules' => [
                         [
                             'allow' => true,
                             'actions' => ['create', 'update','delete'],
                             'roles' => ['@'],
+                        ],
+                        [
+                            'allow' => true,
+                            'actions' => ['subscribe'],
+                            'roles' => ['?'],
                         ],
                     ],
                 ],
@@ -66,7 +72,7 @@ class PersonsController extends Controller
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id)
     {
         $model = new FilmsSearch();
         $filmsProvider = $model->search(['person_id' => $id]);
@@ -106,7 +112,7 @@ class PersonsController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
@@ -126,11 +132,32 @@ class PersonsController extends Controller
      * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete(int $id)
     {
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+
+    /**
+     * @param $id
+     * @return string|\yii\web\Response
+     */
+    public function actionSubscribe(int $id)
+    {
+        $model = new Subsribes();
+        $model->person_id = $id;
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            \Yii::$app->session->setFlash('success', 'Спасибо за подписку!');
+            return $this->redirect(['view', 'id' => $id]);
+        }
+
+        return $this->render('subscribe', [
+            'model' => $model,
+            'session' => \Yii::$app->session,
+        ]);
     }
 
     /**

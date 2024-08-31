@@ -28,8 +28,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-    </p>
+    <?php } else { ?>
+        <?= Html::a('Subscribe', ['subscribe', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
     <?php } ?>
+    </p>
 
     <?= DetailView::widget([
         'model' => $model,
