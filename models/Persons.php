@@ -53,4 +53,39 @@ class Persons extends \yii\db\ActiveRecord
     {
         return $this->hasMany(FilmPersons::class, ['person_id' => 'id']);
     }
+
+    /**
+     * Gets query for [[Films]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFilms()
+    {
+        return $this->hasMany(Films::class, ['id' => 'person_id'])->via('filmPersons');
+    }
+
+    /**
+     * Top person's by films count
+     * @param array $where
+     * @param int $limit
+     * @return array
+     */
+    public static function getTop(array $where, int $limit): array
+    {
+        return self::find()
+            ->select([
+                'persons.id',
+                'persons.fio',
+                'COUNT(films.id) AS `cnt`'
+            ])
+            ->joinWith('films')
+            ->where($where)
+            ->groupBy('persons.id')
+            ->orderBy(['cnt' => 'desc'])
+            ->limit($limit)
+            ->asArray()
+            ->all();
+    }
+
+
 }
