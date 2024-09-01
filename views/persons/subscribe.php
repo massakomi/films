@@ -28,7 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
     }
     ?>
 
-    <?= $form->field($model, 'phone')->textInput(['maxlength' => 20]) ?>
+    <?= $form->field($model, 'phone')->widget(\yii\widgets\MaskedInput::class, [
+        'mask' => '+7999-9999999',
+    ]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\models\forms\UploadForm;
+use Biblys\Isbn\Isbn;
 use Yii;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
@@ -38,10 +39,9 @@ class Films extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'year'], 'required'],
-            [['year'], 'integer'],
-            [['isbn'], 'string', 'max' => 17],
+            [['year'], 'number', 'min' => 1888, 'max' => 1 + (int)date('Y')],
+            [['isbn'], 'isbnCheck'],
             [['description'], 'string'],
-            [['date_added'], 'safe'],
             [['name'], 'string', 'max' => 255],
             ['poster_id', 'file', 'extensions' => 'png, jpg, gif, webp', 'maxSize' => 1024 * 1024 * 10],
             [['poster'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class, 'targetAttribute' => ['poster_id' => 'id']],
@@ -63,6 +63,28 @@ class Films extends \yii\db\ActiveRecord
             'poster' => 'Poster',
             'date_added' => 'Date Added',
         ];
+    }
+
+    public function isbnCheck($attribute, $params)
+    {
+        if (!$this->$attribute) {
+            return;
+        }
+        try {
+            Isbn::validateAsIsbn13($this->$attribute);
+        } catch (\Exception $e) {
+            $this->addError($attribute, $e->getMessage());
+        }
+    }
+
+    /**
+     * Gets query for [[Persons]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPersons()
+    {
+        return $this->hasMany(Persons::class, ['id' => 'person_id'])->via('filmPersons');
     }
 
     /**
@@ -100,6 +122,17 @@ class Films extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $insert
+     * @param array $changedAttributes
+     * @return bool
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+    }
+
+    /**
      * @return void
      * @throws \yii\base\Exception
      */
@@ -124,17 +157,49 @@ class Films extends \yii\db\ActiveRecord
     }
 
     /**
-     * @param array $selectedAuthors
+     * @param array $persons
      * @return void
      * @throws \yii\db\Exception
      */
-    public function savePersons(array $selectedAuthors)
+    public function savePersons(array $personsIds)
     {
-        foreach ($selectedAuthors as $id) {
-            $filmPerson = new FilmPersons();
-            $filmPerson->film_id = $this->id;
-            $filmPerson->person_id = $id;
-            $filmPerson->save();
+        $persons = Persons::findAll(['id' => $personsIds]);
+        $currentPersons = $this->selectedPersons();
+        foreach ($persons as $person) {
+            if (in_array($person->id, $currentPersons)) {
+                unset($currentPersons[array_search($person->id, $currentPersons)]);
+                continue;
+            }
+            $this->link('persons', $person);
+        }
+        foreach ($currentPersons as $person) {
+            $this->unlink('persons', Persons::findOne($person), delete: true);
+        }
+    }
+
+    /**
+     * @param array $persons
+     * @return void
+     * @throws \yii\db\Exception
+     */
+    public function notifyUsers(array $newPersons)
+    {
+        $diffPersons = array_diff($newPersons, $this->selectedPersons());
+        foreach ($diffPersons as $personId) {
+            $person = Persons::findOne($personId);
+            if (!$person->id) {
+                continue;
+            }
+            $subscribers = Subsribes::findAll(['person_id' => $personId]);
+            foreach ($subscribers as $subscriber) {
+                $message = "У актера $person->fio в базе опубликован новый фильм $this->name";
+                try {
+                    SmsPilot::send($subscriber->phone, $message);
+                    Yii::info($message);
+                } catch (\Exception $e) {
+                    Yii::warning($e->getMessage());
+                }
+            }
         }
     }
 

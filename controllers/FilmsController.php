@@ -6,6 +6,7 @@ use app\models\FilmPersons;
 use app\models\Films;
 use app\models\FilmsSearch;
 use app\models\forms\UploadForm;
+use app\models\Persons;
 use yii\filters\AccessControl;
 use yii\helpers\BaseHtml;
 use yii\web\Controller;
@@ -83,14 +84,9 @@ class FilmsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Films();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                $model->uploadPoster();
-                $model->savePersons(\Yii::$app->request->post('Films')['filmPersons']);
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
+        $model = new Films;
+        if ($this->onCreateOrUpdate($model)) {
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             $model->loadDefaultValues();
         }
@@ -110,16 +106,34 @@ class FilmsController extends Controller
     public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            $model->uploadPoster();
-            $model->savePersons(\Yii::$app->request->post('Films')['filmPersons']);
+        if ($this->onCreateOrUpdate($model)) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * Общий метод создания / обновления
+     * @param $model
+     * @return true|void
+     */
+    private function onCreateOrUpdate($model)
+    {
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            $model->uploadPoster();
+            $filmPersons = \Yii::$app->request->post('Films')['filmPersons'];
+            if ($filmPersons) {
+                $filmPersons = array_map('intval', $filmPersons);
+                $model->notifyUsers($filmPersons);
+                $model->savePersons($filmPersons);
+            } else {
+                $model->savePersons([]);
+            }
+            return true;
+        }
     }
 
     /**
